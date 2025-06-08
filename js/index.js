@@ -38,42 +38,24 @@ window.addEventListener("load", () => {
   const ctx = canvas.getContext("2d");
 
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+    requestAnimationFrame(loop);
   }
+
   resizeCanvas();
   window.addEventListener("resize", resizeCanvas);
 
-  function getTopCenter(el) {
+  function getRectPoint(el, pos) {
     const rect = el.getBoundingClientRect();
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top,
-    };
-  }
-
-  function getCenter(el) {
-    const rect = el.getBoundingClientRect();
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    };
-  }
-
-  function getMiddleRight(el) {
-    const rect = el.getBoundingClientRect();
-    return {
-      x: rect.right,
-      y: rect.top + rect.height / 2,
-    };
-  }
-
-  function getMiddleLeft(el) {
-    const rect = el.getBoundingClientRect();
-    return {
-      x: rect.left,
-      y: rect.top + rect.height / 2,
-    };
+    switch (pos) {
+      case "topCenter":
+        return { x: rect.left + rect.width / 2, y: rect.top };
+      case "middleRight":
+        return { x: rect.right, y: rect.top + rect.height / 2 };
+      case "middleLeft":
+        return { x: rect.left, y: rect.top + rect.height / 2 };
+    }
   }
 
   const numDots = 25;
@@ -101,24 +83,39 @@ window.addEventListener("load", () => {
     return { x, y };
   }
 
-  function drawHeartCurves() {
+  function drawHeart() {
     const el1 = document.getElementById("avatar1");
     const el2 = document.getElementById("avatar2");
     const dateTime = document.getElementById("date-fake");
 
-    const p1 = getTopCenter(el1);
-    const p2 = getTopCenter(el2);
-    const timeRect = dateTime.getBoundingClientRect();
-    const centerY = timeRect.top + timeRect.height / 2;
+    const p1 = getRectPoint(el1, "topCenter");
+    const p2 = getRectPoint(el2, "topCenter");
+    const rect = dateTime.getBoundingClientRect();
+    const centerY = rect.top + rect.height / 2;
     const midX = (p1.x + p2.x) / 2;
-    const endPoint = { x: midX, y: centerY + 100 };
 
-    const leftCP1 = { x: p1.x - 200, y: p1.y - 150 };
-    const leftCP2 = { x: p1.x - 260, y: centerY - 50 };
-    const rightCP1 = { x: p2.x + 200, y: p2.y - 150 };
-    const rightCP2 = { x: p2.x + 260, y: centerY - 50 };
+    const isMobile = window.innerWidth <= 992;
+    const offsetY = isMobile ? 60 : 100;
 
-    // Left heart curve
+    const endPoint = { x: midX, y: centerY + offsetY };
+    const leftCP1 = {
+      x: p1.x - (isMobile ? 100 : 200),
+      y: p1.y - (isMobile ? 100 : 150),
+    };
+    const leftCP2 = {
+      x: p1.x - (isMobile ? 130 : 260),
+      y: centerY - (isMobile ? 30 : 50),
+    };
+    const rightCP1 = {
+      x: p2.x + (isMobile ? 100 : 200),
+      y: p2.y - (isMobile ? 100 : 150),
+    };
+    const rightCP2 = {
+      x: p2.x + (isMobile ? 130 : 260),
+      y: centerY - (isMobile ? 30 : 50),
+    };
+
+    // Trái tim trái
     ctx.beginPath();
     ctx.moveTo(p1.x, p1.y);
     ctx.bezierCurveTo(
@@ -135,7 +132,7 @@ window.addEventListener("load", () => {
     ctx.shadowBlur = 10;
     ctx.stroke();
 
-    // Right heart curve
+    // Trái tim phải
     ctx.beginPath();
     ctx.moveTo(p2.x, p2.y);
     ctx.bezierCurveTo(
@@ -148,30 +145,22 @@ window.addEventListener("load", () => {
     );
     ctx.stroke();
 
-    // Left moving dots
-    leftDots.forEach((dot) => {
+    // Dot trái + phải
+    [...leftDots, ...rightDots].forEach((dot, idx) => {
       dot.t += dot.speed;
       if (dot.t > 1) dot.t = 0;
       for (let i = 0; i < 5; i++) {
         const fadeT = dot.t - i * 0.02;
         if (fadeT < 0) continue;
-        const pos = getPointOnBezier(fadeT, p1, leftCP1, leftCP2, endPoint);
-        const alpha = 1 - i * 0.2;
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 102, 204, ${alpha})`;
-        ctx.arc(pos.x, pos.y, 3 - i * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    });
 
-    // Right moving dots
-    rightDots.forEach((dot) => {
-      dot.t += dot.speed;
-      if (dot.t > 1) dot.t = 0;
-      for (let i = 0; i < 5; i++) {
-        const fadeT = dot.t - i * 0.02;
-        if (fadeT < 0) continue;
-        const pos = getPointOnBezier(fadeT, p2, rightCP1, rightCP2, endPoint);
+        const pos = getPointOnBezier(
+          fadeT,
+          idx < numDots ? p1 : p2,
+          idx < numDots ? leftCP1 : rightCP1,
+          idx < numDots ? leftCP2 : rightCP2,
+          endPoint
+        );
+
         const alpha = 1 - i * 0.2;
         ctx.beginPath();
         ctx.fillStyle = `rgba(255, 102, 204, ${alpha})`;
@@ -181,11 +170,11 @@ window.addEventListener("load", () => {
     });
   }
 
-  function drawZigZagBetweenAvatars() {
+  function drawZigzag() {
     const el1 = document.getElementById("avatar1");
     const el2 = document.getElementById("avatar2");
-    const start = getMiddleRight(el1);
-    const end = getMiddleLeft(el2);
+    const start = getRectPoint(el1, "middleRight");
+    const end = getRectPoint(el2, "middleLeft");
 
     const segments = 20;
     const amplitude = 10;
@@ -199,6 +188,7 @@ window.addEventListener("load", () => {
       points.push({ x, y });
     }
 
+    // Vẽ đường zigzag
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
     points.forEach((p) => ctx.lineTo(p.x, p.y));
@@ -209,6 +199,7 @@ window.addEventListener("load", () => {
     ctx.stroke();
     ctx.shadowBlur = 0;
 
+    // Dot chạy
     middleDots.forEach((dot) => {
       dot.t += dot.speed;
       if (dot.t > 1) dot.t = 0;
@@ -225,8 +216,6 @@ window.addEventListener("load", () => {
       const y = p0.y + (p1.y - p0.y) * localT;
 
       for (let i = 0; i < 5; i++) {
-        const fadeT = dot.t - i * 0.02;
-        if (fadeT < 0) continue;
         const alpha = 1 - i * 0.2;
         ctx.beginPath();
         ctx.fillStyle = `rgba(255, 153, 255, ${alpha})`;
@@ -236,11 +225,10 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Vòng lặp animation
-  requestAnimationFrame(function loop() {
+  function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawHeartCurves();
-    drawZigZagBetweenAvatars();
+    drawHeart();
+    drawZigzag();
     requestAnimationFrame(loop);
-  });
+  }
 });
