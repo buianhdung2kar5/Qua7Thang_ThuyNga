@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kiểm tra ngày</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fef2f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 12px;
+        }
+
+        button {
+            background: #e91e63;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>𝓝𝓱𝓪̣̂𝓹 𝓷𝓰𝓪̀𝔂 𝓭𝓪̣̆𝓬 𝓫𝓲𝓮̣̂𝓽 🎀🎀🎀:</h2>
+    <input type="date" id="dateInput">
+    <button onclick="checkDate()">Xác nhận</button>
+
+    <div id="message"></div>
+
+    <script>
+        function checkDate() {
+            const userDate = document.getElementById("dateInput").value;
+            const correctDate = "2024-11-09"; // ✅ Ngày đúng cần nhập
+            const message = document.getElementById("message");
+            message.textContent = "";
+            message.className = "";
+
+            if (userDate === correctDate) {
+                message.textContent = "Đỉnh cáaaaaa, chờ một chíiiii.......";
+                message.className = "success";
+
+                setTimeout(() => {
+                    window.location.href = "homepage1.html"; // 👉 Thay link tại đây
+                }, 2000); // Delay nhẹ để thấy phản hồi
+            } else {
+                message.textContent = "Ngày không đúng. Vui lòng thử lại.";
+                message.className = "error";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

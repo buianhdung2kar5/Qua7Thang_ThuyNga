@@ -1,0 +1,196 @@
+/* Reset & base */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #000;
+  overflow: hidden;
+}
+
+/* Video nền */
+.container {
+  position: relative;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+}
+.container .image-desc {
+  position: absolute;
+  max-width: 100%;
+  max-height: 100px;
+  left: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container .image-desc img {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.container .image-desc p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Giao diện chính */
+.interface {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Thời gian */
+.ht {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#date-fake {
+  height: 100px;
+  width: 100%;
+}
+
+#date-time {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 60px;
+  position: relative;
+  z-index: 2;
+  max-width: 516px;
+}
+
+.time {
+  padding: 3px 6px;
+  min-width: 120px;
+  min-height: 30px;
+  flex: 1 1 calc(33.33% - 12px); /* Mỗi hàng tối đa 3 ô */
+  max-width: calc(33.33% - 12px);
+  border-radius: 12px;
+  background-color: #e074c5;
+  border: 1px solid #a34fa3;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  box-shadow: 0 0 10px rgba(255, 102, 204, 0.3);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.second {
+  min-height: 200px;
+  font-size: 30px;
+}
+.time p {
+  margin: 0;
+}
+
+/* Avatar cặp */
+.avatar-pair {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  margin-top: 120px;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Text dưới avatar */
+.image {
+  text-align: center;
+}
+
+.image-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.inner-logo {
+  font-size: 18px;
+  color: #b087f3;
+}
+
+.inner-text {
+  font-family: "Courier New", cursive;
+  color: black;
+  font-weight: bold;
+}
+
+/* Canvas */
+canvas,
+#connector {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Responsive (optional, nếu bạn cần) */
+@media (max-width: 600px) {
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .time {
+    padding: 6px 10px;
+    min-width: 70px;
+    font-size: 13px;
+  }
+
+  #date-time {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .avatar-pair {
+    gap: 40px;
+    margin-top: 60px;
+  }
+}
